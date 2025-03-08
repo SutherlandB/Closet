@@ -1,9 +1,10 @@
 import {StyleSheet, View, Pressable, Text} from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome'
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import {colors} from '@/theme/color';
 
 type Props = {
     label: string;
-    theme?: 'primary';
+    theme?: 'primary' | 'standard';
     onPress?: () => void;
 
 };
@@ -25,6 +26,18 @@ export default function Button({label, theme, onPress}: Props) {
             </Pressable>
           </View>
         );
+      }
+      else if (theme === 'standard'){
+        return (
+          <View style={[ styles.buttonContainerStandard
+          ]}>
+            <Pressable
+              style={[styles.button, { backgroundColor: '#fff' }]}
+              onPress={onPress}>
+              <Text style={[styles.buttonLabel, { color: '#25292e' }]}>{label}</Text>
+            </Pressable>
+          </View>
+        )
       }
       
     
@@ -61,4 +74,12 @@ const styles = StyleSheet.create({
     buttonIcon: {
         paddingRight: 8,
     },
+    buttonContainerStandard: {
+      width: 320,
+      height: 50,
+      
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 3,
+  },
 });
