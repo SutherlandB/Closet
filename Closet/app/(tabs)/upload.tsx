@@ -1,14 +1,18 @@
 import {Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from '@react-native-vector-icons/fontawesome5';
 import Button from '@/components/Button';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Image } from "expo-image";
 import CircleButton from '@/components/CircleButton';
 import IconButton from '@/components/IconButton';
 import { EventEmitter } from 'events';
 import { sendImageToApi } from '@/util/removeBackground';
-import * as ImageManipulator from 'expo-image-manipulator';
+import { rotateImage } from '@/util/rotateImage';
+import { sendImageToComfyUI } from '@/util/comfyUI';
+import { shirtWorkflow, shirtWorkflow2} from '@/util/workflows';
+import { compressImage } from '@/util/compressImage';
+
 
 
 export const dbEvents = new EventEmitter();
@@ -21,23 +25,7 @@ export default function Upload(){
     const [uri, setUri] = useState<string | null>(null);
     const[currentCategory, setCategory] = useState<string | null>(null);
     const localIP = "http://128.113.138.119:5000";
-    const [context, setContext] = useState<ImageManipulator.ImageManipulatorContext | null>(null);
-
-    
-    const rotate90 = async () => {
-      if(uri){
-        setContext(ImageManipulator.useImageManipulator(uri));
-     }
-      if(context){
-      context.rotate(90);
-      const image = await context.renderAsync();
-      const result = await image.saveAsync({
-        format: ImageManipulator.SaveFormat.PNG,
-      });
-      setUri(result.uri);
-      return result.uri;
-    }};
-    
+    // const [context, setContext] = useState<ImageManipulatorContext | null>(null);
 
     if (!permission) {
         // Camera permissions are still loading.
@@ -54,7 +42,6 @@ export default function Upload(){
         );
       }
     const takePicture = async () => {
-        console.log("hy")
         const photo = await ref.current?.takePictureAsync();
         // if(photo){
         //   return photo;
@@ -63,13 +50,35 @@ export default function Upload(){
         if (photo){
             // setUri(photo?.uri);
             // console.log("lmao");
-            
+            console.log("Photo taken, compressing...");
+            const compressedUri = await compressImage(photo.uri);
             if (currentCategory === "Shirt"){
-              let newPhoto = await sendImageToApi(photo.uri, localIP)
+              console.log("starting");
+              if (!compressedUri){
+                console.error("Failed to compress image.");
+                return;
+              }
+              console.log("wow");
+              const imageUri = await sendImageToComfyUI(compressedUri, shirtWorkflow2);
+              console.log("returned uri:", imageUri);
+              if(imageUri){
               
-              if(newPhoto)
-              dummyDB.Shirt.push(newPhoto)
-              setUri(newPhoto)
+              dummyDB.Shirt.push(imageUri)
+              // console.log(dummyDB);
+              if (imageUri!== "error")
+              setUri(imageUri);
+              } // Save processed image URI
+              ;
+              
+              // if(newPhoto){
+              //   finalPhoto = await rotateImage(newPhoto);
+              //   console.log("love");
+              //   if(finalPhoto)
+              //   dummyDB.Shirt.push(finalPhoto)
+              // }
+              
+              // {finalPhoto ? (setUri(finalPhoto)) : (console.error())}
+
 
             }
             else if (currentCategory === "Socks"){
@@ -98,7 +107,7 @@ export default function Upload(){
             }
             dbEvents.emit('dbUpdated', { currentCategory, uri });
         }
-        console.log(dummyDB);
+        // console.log(dummyDB);
     };
 
     // const pickImageAsync = async () => {

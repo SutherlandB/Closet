@@ -32,6 +32,7 @@ export default function Button({label, theme, onPress}: Props) {
           <View style={[ styles.buttonContainerStandard
           ]}>
             <Pressable
+            
               style={[styles.button, { backgroundColor: '#fff' }]}
               onPress={onPress}>
               <Text style={[styles.buttonLabel, { color: '#25292e' }]}>{label}</Text>
