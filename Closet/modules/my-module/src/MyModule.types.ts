@@ -13,7 +13,7 @@ export type ChangeEventPayload = {
 };
 
 export type MyModuleViewProps = {
-  // url: string;
+  url?: string;
   // onLoad: (event: { nativeEvent: OnLoadEventPayload }) => void;
   // style?: StyleProp<ViewStyle>;
 } & ViewProps;

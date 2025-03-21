@@ -12,6 +12,8 @@ import { rotateImage } from '@/util/rotateImage';
 import { sendImageToComfyUI } from '@/util/comfyUI';
 import { shirtWorkflow, shirtWorkflow2} from '@/util/workflows';
 import { compressImage } from '@/util/compressImage';
+import MyModule from "@/modules/my-module";
+
 
 
 
@@ -43,6 +45,7 @@ export default function Upload(){
       }
     const takePicture = async () => {
         const photo = await ref.current?.takePictureAsync();
+
         // if(photo){
         //   return photo;
         // }
@@ -52,22 +55,43 @@ export default function Upload(){
             // console.log("lmao");
             console.log("Photo taken, compressing...");
             const compressedUri = await compressImage(photo.uri);
+
             if (currentCategory === "Shirt"){
-              console.log("starting");
-              if (!compressedUri){
-                console.error("Failed to compress image.");
-                return;
+              if(compressedUri){
+                console.log("sending compressedURI")
+                const subjectImageUrl = await MyModule.getSubjectImageURL(compressedUri);
+                if(subjectImageUrl){
+                  dummyDB.Shirt.push(subjectImageUrl.toString());
+                  setUri(subjectImageUrl.toString())
               }
-              console.log("wow");
-              const imageUri = await sendImageToComfyUI(compressedUri, shirtWorkflow2);
-              console.log("returned uri:", imageUri);
-              if(imageUri){
+
               
-              dummyDB.Shirt.push(imageUri)
-              // console.log(dummyDB);
-              if (imageUri!== "error")
-              setUri(imageUri);
-              } // Save processed image URI
+
+              } else{
+                console.log("failed")
+              }
+              
+
+            
+              // if(compressedUri)
+              // dummyDB.Shirt.push(compressedUri);
+              
+
+              // console.log("starting");
+              // if (!compressedUri){
+              //   console.error("Failed to compress image.");
+              //   return;
+              // }
+              // console.log("wow");
+              // const imageUri = await sendImageToComfyUI(compressedUri, shirtWorkflow2);
+              // console.log("returned uri:", imageUri);
+              // if(imageUri){
+              
+              // dummyDB.Shirt.push(imageUri)
+              // // console.log(dummyDB);
+              // if (imageUri!== "error")
+              // setUri(imageUri);
+              // } // Save processed image URI
               ;
               
               // if(newPhoto){

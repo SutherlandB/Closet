@@ -7,7 +7,7 @@ export const compressImage = async (uri: string): Promise<string | null> => {
         // Resize the image to 1080x1080
         const compressed = await ImageManipulator.manipulateAsync(
             uri, 
-            [{ resize: { width: 1080, height: 1080 } }], 
+            [{ resize: { width: 1080 } }], 
             { compress: 0.8, format: ImageManipulator.SaveFormat.PNG }
         );
 
