@@ -60,11 +60,21 @@ export default function EditScreen() {
     oWidth = original.width();
     oHeight = original.height();
   }
+  let cWidth = 0;
+  let cHeight = 0;
+  if(cutout){
+    cWidth = cutout.width();
+    cHeight = cutout.height();
+  }
+  console.log(Math.ceil(cWidth/3),Math.ceil(cHeight/3));
   const imageAspectRatio = oHeight / oWidth;
+  const imageAspectRatio2 = cHeight / cWidth;
   const scale = PixelRatio.get();
   const canvasWidth = width;
   const canvasHeight = width * imageAspectRatio;
   console.log("canvas dimensions: ", canvasWidth, "x", canvasHeight);
+  const scaleFactor = canvasWidth/oWidth;
+
   const [isDrawing, setIsDrawing] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(30);
   const [paths, undo, redo, setPaths, canUndo, canRedo] =
@@ -248,11 +258,13 @@ export default function EditScreen() {
                 >
                   <Image
                     image={cutout}
-                    fit="contain"
+                    fit="fill"
                     x={0}
                     y={0}
-                    width={canvasWidth}
-                    height={canvasHeight}
+                    width={cWidth * scaleFactor}
+                    // Math.ceil(canvasWidth < cWidth / scale ?  canvasWidth : cWidth / scale)
+                    height={cHeight * scaleFactor }
+                    // Math.ceil(canvasHeight < cHeight / scale ? canvasHeight : cWidth / scale * imageAspectRatio)
                   />
                 </Mask>
               )}
@@ -315,8 +327,8 @@ export default function EditScreen() {
                     fit="contain"
                     x={0}
                     y={0}
-                    width={canvasWidth}
-                    height={canvasHeight}
+                    width={canvasWidth < cWidth / scale ?  canvasWidth : cWidth / scale}
+                    height={canvasHeight < cHeight / scale ? canvasHeight : cHeight / scale}
                   />
                 </Mask>
               )}

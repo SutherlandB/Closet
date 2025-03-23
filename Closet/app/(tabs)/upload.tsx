@@ -63,6 +63,7 @@ export default function Upload(){
                 console.log("sending compressedURI")
                 const subjectImageUrl = await MyModule.getSubjectImageURL(compressedUri);
                 if(subjectImageUrl){
+                  
                   router.push({
                     pathname: '/editScreen',
                     params: {

@@ -132,14 +132,23 @@ class MyModuleView: ExpoView {
 
   func liftSubject(from image: UIImage) async -> String? {
     do{
-    let imageView = UIImageView()
+    // let imageView = UIImageView()
+    let imageView = UIImageView(image: image)
+        imageView.frame = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+
+    // Add the imageView to a temporary off-screen window to ensure it's in the view hierarchy
+    let window = UIWindow(frame: imageView.frame)
+    window.isHidden = false
+    window.addSubview(imageView)
+
+    
     let analysis = try? await analyzer.analyze(image, configuration: configuration)
     guard let analysis = analysis else { return nil }
 
     await MainActor.run {
       interaction.analysis = analysis
       interaction.preferredInteractionTypes = [.automatic]
-      self.imageView.addInteraction(self.interaction)
+      imageView.addInteraction(self.interaction)
 
 
     }
@@ -150,7 +159,7 @@ class MyModuleView: ExpoView {
       return nil
     }
     let subjectCropRect = subject.bounds
-    print(subjectCropRect)
+    print("please god",subjectCropRect)
 
     guard let cropped = try? await subject.image else{
       return nil
