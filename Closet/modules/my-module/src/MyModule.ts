@@ -7,7 +7,15 @@ declare class MyModule extends NativeModule<MyModuleEvents> {
   hello(): string;
   setValueAsync(value: string): Promise<void>;
 
-  getSubjectImageURL(imagePath: String): Promise<String>;
+  getSubjectImageData(imagePath: string): Promise<{
+    uri: string;
+    bounds: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+  }>;
 }
 
 // This call loads the native module object from the JSI.

@@ -12,7 +12,7 @@ import { rotateImage } from '@/util/rotateImage';
 import { sendImageToComfyUI } from '@/util/comfyUI';
 import { shirtWorkflow, shirtWorkflow2} from '@/util/workflows';
 import { compressImage } from '@/util/compressImage';
-import MyModule from "@/modules/my-module";
+// import MyModule from "@/modules/my-module";
 import { router } from 'expo-router';
 
 
@@ -61,7 +61,9 @@ export default function Upload(){
             if (currentCategory === "Shirt"){
               if(compressedUri){
                 console.log("sending compressedURI")
-                const subjectImageUrl = await MyModule.getSubjectImageURL(compressedUri);
+                const result = await MyModule.getSubjexctImageURL(compressedUri);
+                const subjectImageUrl = result.uri;
+                const bounds = result.bounds;
                 if(subjectImageUrl){
                   
                   router.push({
@@ -69,6 +71,7 @@ export default function Upload(){
                     params: {
                       image: compressedUri,
                       subject: subjectImageUrl.toString(),
+                      bounds: bounds,
                     },
                   });
                   dummyDB.Shirt.push(subjectImageUrl.toString());

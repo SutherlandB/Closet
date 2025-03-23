@@ -22,7 +22,7 @@ class MyModuleView: ExpoView {
 
         if let image = assignedImage {
             imageView.image = image // ✅ Update imageView
-            processImage(image) // ✅ Optional: Process the image
+            // processImage(image) // ✅ Optional: Process the image
         }
     }
 }
@@ -130,7 +130,7 @@ class MyModuleView: ExpoView {
   // }
 
 
-  func liftSubject(from image: UIImage) async -> String? {
+  func liftSubject(from image: UIImage) async -> [String: Any]? {
     do{
     // let imageView = UIImageView()
     let imageView = UIImageView(image: image)
@@ -176,7 +176,15 @@ class MyModuleView: ExpoView {
     try imageData.write(to: outputFileUrl)
     print("✅ Subject Image Saved: \(outputFileUrl.absoluteString)")
 
-    return outputFileUrl.absoluteString  // ✅ Return file URL
+    return [
+      "uri": outputFileUrl.absoluteString,
+      "bounds": [
+        "x": bounds.origin.x,
+        "y": bounds.origin.y,
+        "width": bounds.size.width,
+        "height": bounds.size.height
+      ]
+    ]
         } catch {
             print("❌ Error extracting subject: \(error)")
             return nil
@@ -222,39 +230,39 @@ class MyModuleView: ExpoView {
     }
 }
 
-func loadImage(from uri: String) {
-    DispatchQueue.main.async {
-      if uri.hasPrefix("file://") {
-        // ✅ Load local image
-        let filePath = URL(fileURLWithPath: uri).path
-        if let image = UIImage(contentsOfFile: filePath) {
-          self.processImage(image)
-        } else {
-          print("⚠️ Failed to load local image: \(filePath)")
-        }
-      } else if uri.hasPrefix("http") {
-        // ✅ Load remote image
-        guard let url = URL(string: uri) else {
-          print("⚠️ Invalid URL: \(uri)")
-          return
-        }
-        let task = URLSession.shared.dataTask(with: url) { data, _, error in
-          if let error = error {
-            print("⚠️ Error loading image: \(error.localizedDescription)")
-            return
-          }
-          if let data = data, let image = UIImage(data: data) {
-            DispatchQueue.main.async {
-              self.processImage(image)
-            }
-          }
-        }
-        task.resume()
-      } else {
-        print("⚠️ Unsupported URI format: \(uri)")
-      }
-    }
-  }
+// func loadImage(from uri: String) {
+//     DispatchQueue.main.async {
+//       if uri.hasPrefix("file://") {
+//         // ✅ Load local image
+//         let filePath = URL(fileURLWithPath: uri).path
+//         if let image = UIImage(contentsOfFile: filePath) {
+//           self.processImage(image)
+//         } else {
+//           print("⚠️ Failed to load local image: \(filePath)")
+//         }
+//       } else if uri.hasPrefix("http") {
+//         // ✅ Load remote image
+//         guard let url = URL(string: uri) else {
+//           print("⚠️ Invalid URL: \(uri)")
+//           return
+//         }
+//         let task = URLSession.shared.dataTask(with: url) { data, _, error in
+//           if let error = error {
+//             print("⚠️ Error loading image: \(error.localizedDescription)")
+//             return
+//           }
+//           if let data = data, let image = UIImage(data: data) {
+//             DispatchQueue.main.async {
+//               self.processImage(image)
+//             }
+//           }
+//         }
+//         task.resume()
+//       } else {
+//         print("⚠️ Unsupported URI format: \(uri)")
+//       }
+//     }
+//   }
 
   // func processImage(_ image: UIImage) {
   //   self.imageView.image = image
@@ -267,19 +275,19 @@ func loadImage(from uri: String) {
   //     }
   //   }
   // }
-  func processImage(_ image: UIImage) {
-        self.imageView.image = image
-        self.imageView.addInteraction(self.interaction)
+  // func processImage(_ image: UIImage) {
+  //       self.imageView.image = image
+  //       self.imageView.addInteraction(self.interaction)
 
-        Task {
-            if let subjectImageUrl = await self.liftSubject(from: image) {
-                DispatchQueue.main.async {
-                    self.subjectImageView.image = UIImage(contentsOfFile: URL(string: subjectImageUrl)!.path)
-                    print("📸 Subject Image URL: \(subjectImageUrl)")
-                }
-            }
-        }
-    }
+  //       Task {
+  //           if let subjectImageUrl = await self.liftSubject(from: image) {
+  //               DispatchQueue.main.async {
+  //                   self.subjectImageView.image = UIImage(contentsOfFile: URL(string: subjectImageUrl)!.path)
+  //                   print("📸 Subject Image URL: \(subjectImageUrl)")
+  //               }
+  //           }
+  //       }
+  //   }
 
   
 

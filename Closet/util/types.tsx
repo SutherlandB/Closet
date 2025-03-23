@@ -2,6 +2,7 @@ import { SkPath } from "@shopify/react-native-skia";
 export type EditScreenParams = {
     image: string;
     subject: string;
+    bounds: string;
   };
 export type PathWithWidth = {
     path: SkPath;

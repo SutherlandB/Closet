@@ -50,10 +50,12 @@ import { saveImageLocally, useUndoRedo } from '@/util/helpers';
 export default function EditScreen() {
 
 
-  const { image, subject } = useLocalSearchParams<EditScreenParams>();
+  const { image, subject, bounds } = useLocalSearchParams<EditScreenParams>();
   const {width, height} = useWindowDimensions();
   const cutout = useImage(subject);
   const original = useImage(image);
+  const subjectBounds = bounds;
+  console.log(subjectBounds);
   let oWidth = 0;
   let oHeight = 0;
   if(original){
