@@ -11,7 +11,7 @@ export const compressImage = async (uri: string): Promise<string | null> => {
             { compress: 0.8, format: ImageManipulator.SaveFormat.PNG }
         );
 
-        console.log("Compression complete:", compressed.uri);
+        console.log("Compression complete:", compressed.uri, compressed.height, compressed.width);
         return compressed.uri;
     } catch (error) {
         console.error("Error compressing image:", error);

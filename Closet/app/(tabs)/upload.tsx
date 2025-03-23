@@ -13,6 +13,8 @@ import { sendImageToComfyUI } from '@/util/comfyUI';
 import { shirtWorkflow, shirtWorkflow2} from '@/util/workflows';
 import { compressImage } from '@/util/compressImage';
 import MyModule from "@/modules/my-module";
+import { router } from 'expo-router';
+
 
 
 
@@ -61,17 +63,19 @@ export default function Upload(){
                 console.log("sending compressedURI")
                 const subjectImageUrl = await MyModule.getSubjectImageURL(compressedUri);
                 if(subjectImageUrl){
+                  router.push({
+                    pathname: '/editScreen',
+                    params: {
+                      image: compressedUri,
+                      subject: subjectImageUrl.toString(),
+                    },
+                  });
                   dummyDB.Shirt.push(subjectImageUrl.toString());
                   setUri(subjectImageUrl.toString())
-              }
-
-              
-
+                }
               } else{
                 console.log("failed")
               }
-              
-
             
               // if(compressedUri)
               // dummyDB.Shirt.push(compressedUri);
@@ -92,7 +96,7 @@ export default function Upload(){
               // if (imageUri!== "error")
               // setUri(imageUri);
               // } // Save processed image URI
-              ;
+              // ;
               
               // if(newPhoto){
               //   finalPhoto = await rotateImage(newPhoto);

@@ -132,19 +132,25 @@ class MyModuleView: ExpoView {
 
   func liftSubject(from image: UIImage) async -> String? {
     do{
+    let imageView = UIImageView()
     let analysis = try? await analyzer.analyze(image, configuration: configuration)
     guard let analysis = analysis else { return nil }
 
     await MainActor.run {
       interaction.analysis = analysis
       interaction.preferredInteractionTypes = [.automatic]
+      self.imageView.addInteraction(self.interaction)
+
 
     }
     //debugPrint("\(await interaction.subjects.count)")
 
+
     guard let subject = await interaction.subjects.first else{ 
       return nil
     }
+    let subjectCropRect = subject.bounds
+    print(subjectCropRect)
 
     guard let cropped = try? await subject.image else{
       return nil
