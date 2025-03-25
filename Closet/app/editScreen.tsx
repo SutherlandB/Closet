@@ -1,4 +1,6 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
+import { ScrollView } from 'react-native';
+import { v4 as uuidv4 } from 'uuid';
 import { PixelRatio } from 'react-native';
 import type { EditScreenParams } from '@/util/types';
 import React, { useState } from 'react';
@@ -39,23 +41,33 @@ import {
   GluestackUIProvider
 } from '@gluestack-ui/themed';
 import { config } from '@gluestack-ui/config';
-
 // import { EditorScreenPropType, PathWithWidth } from '../../types';
 import { PathWithWidth } from '@/util/types';
 // import { saveImageLocally, useUndoRedo } from '../Home/helpers';
 import { saveImageLocally, useUndoRedo } from '@/util/helpers';
+import { ClothingItem } from '@/models/ClothingItem';
+import { useForm, Controller } from 'react-hook-form';
+
 
 
 
 export default function EditScreen() {
 
-
-  const { image, subject, bounds } = useLocalSearchParams<EditScreenParams>();
+  const { image, subject, bounds, category } = useLocalSearchParams<EditScreenParams>();
   const {width, height} = useWindowDimensions();
   const cutout = useImage(subject);
   const original = useImage(image);
-  const subjectBounds = bounds;
-  console.log(subjectBounds);
+  const subjectBounds = JSON.parse(bounds as string);
+  const { control, handleSubmit } = useForm({
+  defaultValues: {
+    brand: '',
+    name: '',
+    category: '',
+    
+  },
+});
+  console.log("Data3: " , subjectBounds);
+  
   let oWidth = 0;
   let oHeight = 0;
   if(original){
@@ -76,6 +88,8 @@ export default function EditScreen() {
   const canvasHeight = width * imageAspectRatio;
   console.log("canvas dimensions: ", canvasWidth, "x", canvasHeight);
   const scaleFactor = canvasWidth/oWidth;
+  const subjectX = subjectBounds.x * scaleFactor;
+  const subjectY = subjectBounds.y * scaleFactor;
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [strokeWidth, setStrokeWidth] = useState(30);
@@ -94,16 +108,30 @@ export default function EditScreen() {
   const offset = OVERLAY_WIDTH / 2;
 
   const onSave = async () => {
+    
+    console.log("saving")
     const skiaImage = ref.current?.makeImageSnapshot();
     if (!skiaImage) return;
-
-    const base64 = skiaImage.encodeToBase64(ImageFormat.PNG, 30);
+    console.log("snapshot taken")
+    const base64 = skiaImage.encodeToBase64(ImageFormat.PNG, 100);
+    console.log("here");
+    const uniqueFileName = subject.substring(subject.lastIndexOf('/')+1,subject.length); 
     const fileUri = await saveImageLocally({
-      fileName: 'updated-cutout.png',
+      fileName: uniqueFileName,
       base64,
     });
-    shareAsync(fileUri);
+    console.log(fileUri);
+    console.log(category);
+    router.replace({
+      pathname: '/upload',
+      params: {
+        editedImage: fileUri,
+        category: category,
+      },
+    });
+
   };
+  
 
   const updatePaths = (currentPathValue: SkPath) => {
     const newPath = {
@@ -199,6 +227,12 @@ export default function EditScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
     <GluestackUIProvider config={config}>
+    <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 64, }}
+        keyboardShouldPersistTaps="handled"
+        
+      >
     <View style={{ flex: 1 }}>
       <View
         style={{
@@ -230,12 +264,22 @@ export default function EditScreen() {
                 <Mask
                   mask={
                     <>
-                      <Image
+                    {<Image
+                    image={cutout}
+                    fit="fill"
+                    x={subjectX}
+                    y={subjectY}
+                    width={cWidth * scaleFactor}
+                    // Math.ceil(canvasWidth < cWidth / scale ?  canvasWidth : cWidth / scale)
+                    height={cHeight * scaleFactor }
+                    // Math.ceil(canvasHeight < cHeight / scale ? canvasHeight : cWidth / scale * imageAspectRatio)
+                  />}
+                      {/* <Image
                         image={original}
                         fit="contain"
                         width={canvasWidth}
                         height={canvasHeight}
-                      />
+                      /> */}
                       {paths.map(path => (
                         <Path
                           key={path.id}
@@ -258,16 +302,22 @@ export default function EditScreen() {
                     </>
                   }
                 >
-                  <Image
+                  {<Image
+                        image={original}
+                        fit="contain"
+                        width={canvasWidth}
+                        height={canvasHeight}
+                      /> }
+                  {/* <Image
                     image={cutout}
                     fit="fill"
-                    x={0}
-                    y={0}
+                    x={subjectX}
+                    y={subjectY}
                     width={cWidth * scaleFactor}
                     // Math.ceil(canvasWidth < cWidth / scale ?  canvasWidth : cWidth / scale)
                     height={cHeight * scaleFactor }
                     // Math.ceil(canvasHeight < cHeight / scale ? canvasHeight : cWidth / scale * imageAspectRatio)
-                  />
+                  /> */}
                 </Mask>
               )}
             </Canvas>
@@ -276,15 +326,6 @@ export default function EditScreen() {
         <Animated.View style={overlayViewStyle}>
           <View style={{ width: canvasWidth, height: canvasHeight }} />
           <Animated.View style={magnifyViewStyle}>
-            <GlueStackImage
-              width={canvasWidth}
-              height={canvasHeight}
-              resizeMode="contain"
-              source={{ uri: image }}
-              alt="Background"
-              position="absolute"
-              opacity={0.2}
-            />
             <Canvas
               style={{
                 width: canvasWidth,
@@ -296,12 +337,16 @@ export default function EditScreen() {
                 <Mask
                   mask={
                     <>
-                      <Image
-                        image={original}
-                        fit="contain"
-                        width={canvasWidth}
-                        height={canvasHeight}
-                      />
+                      {<Image
+                    image={cutout}
+                    fit="fill"
+                    x={subjectX}
+                    y={subjectY}
+                    width={cWidth * scaleFactor}
+                    // Math.ceil(canvasWidth < cWidth / scale ?  canvasWidth : cWidth / scale)
+                    height={cHeight * scaleFactor }
+                    // Math.ceil(canvasHeight < cHeight / scale ? canvasHeight : cWidth / scale * imageAspectRatio)
+                  />}
                       {paths.map(path => (
                         <Path
                           key={path.id}
@@ -324,14 +369,12 @@ export default function EditScreen() {
                     </>
                   }
                 >
-                  <Image
-                    image={cutout}
-                    fit="contain"
-                    x={0}
-                    y={0}
-                    width={canvasWidth < cWidth / scale ?  canvasWidth : cWidth / scale}
-                    height={canvasHeight < cHeight / scale ? canvasHeight : cHeight / scale}
-                  />
+                  {<Image
+                        image={original}
+                        fit="contain"
+                        width={canvasWidth}
+                        height={canvasHeight}
+                      /> }
                 </Mask>
               )}
             </Canvas>
@@ -383,12 +426,13 @@ export default function EditScreen() {
             <SliderThumb />
           </Slider>
         </Box>
+        
         <Button onPress={onSave} mt={20}>
-          <ButtonText>Save image</ButtonText>
+          <ButtonText>Save</ButtonText>
         </Button>
       </VStack>
     </View>
-  
+    </ScrollView>
   </GluestackUIProvider>
   </GestureHandlerRootView>
   );

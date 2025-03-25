@@ -24,7 +24,9 @@
 - (NSURL *)bundleURL
 {
 #if DEBUG
-  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@".expo/.virtual-metro-entry"];
+  // return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@".expo/.virtual-metro-entry"];
+  return [NSURL URLWithString:@"https://2db5-2600-387-f-5d10-00-a.ngrok-free.app/.expo/.virtual-metro-entry.bundle?platform=ios&dev=true"];
+
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif

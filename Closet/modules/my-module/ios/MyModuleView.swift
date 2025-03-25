@@ -179,10 +179,10 @@ class MyModuleView: ExpoView {
     return [
       "uri": outputFileUrl.absoluteString,
       "bounds": [
-        "x": bounds.origin.x,
-        "y": bounds.origin.y,
-        "width": bounds.size.width,
-        "height": bounds.size.height
+        "x": subjectCropRect.origin.x,
+        "y": subjectCropRect.origin.y,
+        "width": subjectCropRect.size.width,
+        "height": subjectCropRect.size.height
       ]
     ]
         } catch {

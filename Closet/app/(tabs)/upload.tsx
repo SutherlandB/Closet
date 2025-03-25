@@ -12,12 +12,8 @@ import { rotateImage } from '@/util/rotateImage';
 import { sendImageToComfyUI } from '@/util/comfyUI';
 import { shirtWorkflow, shirtWorkflow2} from '@/util/workflows';
 import { compressImage } from '@/util/compressImage';
-// import MyModule from "@/modules/my-module";
-import { router } from 'expo-router';
-
-
-
-
+import MyModule from "@/modules/my-module";
+import { router, useLocalSearchParams } from 'expo-router';
 
 export const dbEvents = new EventEmitter();
 
@@ -28,7 +24,25 @@ export default function Upload(){
     const ref = useRef<CameraView>(null);
     const [uri, setUri] = useState<string | null>(null);
     const[currentCategory, setCategory] = useState<string | null>(null);
-    const localIP = "http://128.113.138.119:5000";
+    const { editedImage, category } = useLocalSearchParams();
+
+    useEffect(() => {
+      if (editedImage) {
+        console.log(category);
+        if (category === "Shirt")
+          dummyDB.Shirt.push(editedImage.toString());
+        if (category === "Pants")
+          dummyDB.Pants.push(editedImage.toString());
+        if (category === "Shoes")
+          dummyDB.Shoes.push(editedImage.toString());
+        if (category === "Socks")
+          dummyDB.Socks.push(editedImage.toString());
+        if(category === "Jackets")
+          dummyDB.Jackets.push(editedImage.toString());
+        setUri(editedImage.toString());
+      }
+    }, [editedImage]);
+    // const localIP = "http://128.113.138.119:5000";
     // const [context, setContext] = useState<ImageManipulatorContext | null>(null);
 
     if (!permission) {
@@ -61,9 +75,9 @@ export default function Upload(){
             if (currentCategory === "Shirt"){
               if(compressedUri){
                 console.log("sending compressedURI")
-                const result = await MyModule.getSubjexctImageURL(compressedUri);
+                const result = await MyModule.getSubjectImageURL(compressedUri);
                 const subjectImageUrl = result.uri;
-                const bounds = result.bounds;
+                const bounds = result.bounds
                 if(subjectImageUrl){
                   
                   router.push({
@@ -71,11 +85,11 @@ export default function Upload(){
                     params: {
                       image: compressedUri,
                       subject: subjectImageUrl.toString(),
-                      bounds: bounds,
+                      bounds: JSON.stringify(bounds),
+                      category: currentCategory
                     },
                   });
-                  dummyDB.Shirt.push(subjectImageUrl.toString());
-                  setUri(subjectImageUrl.toString())
+                  
                 }
               } else{
                 console.log("failed")
@@ -114,30 +128,114 @@ export default function Upload(){
 
             }
             else if (currentCategory === "Socks"){
-              let newPhoto = await sendImageToApi(photo.uri, localIP)
-              if(newPhoto)
-              dummyDB.Socks.push(newPhoto)
-              setUri(newPhoto)
+              // let newPhoto = await sendImageToApi(photo.uri, localIP)
+              // if(newPhoto)
+              // dummyDB.Socks.push(newPhoto)
+              // setUri(newPhoto)
+              if(compressedUri){
+                console.log("sending compressedURI")
+                const result = await MyModule.getSubjectImageURL(compressedUri);
+                const subjectImageUrl = result.uri;
+                const bounds = result.bounds
+                if(subjectImageUrl){
+                  
+                  router.push({
+                    pathname: '/editScreen',
+                    params: {
+                      image: compressedUri,
+                      subject: subjectImageUrl.toString(),
+                      bounds: JSON.stringify(bounds),
+                      category: currentCategory
+                    },
+                  });
+                  
+                }
+              } else{
+                console.log("failed")
+              }
             }
             else if (currentCategory === "Pants"){
-              let newPhoto = await sendImageToApi(photo.uri, localIP)
-              if(newPhoto)
-              dummyDB.Pants.push(newPhoto)
-              setUri(newPhoto)
+              // let newPhoto = await sendImageToApi(photo.uri, localIP)
+              // if(newPhoto)
+              // dummyDB.Pants.push(newPhoto)
+              // setUri(newPhoto)
+              if(compressedUri){
+                console.log("sending compressedURI")
+                const result = await MyModule.getSubjectImageURL(compressedUri);
+                const subjectImageUrl = result.uri;
+                const bounds = result.bounds
+                if(subjectImageUrl){
+                  
+                  router.push({
+                    pathname: '/editScreen',
+                    params: {
+                      image: compressedUri,
+                      subject: subjectImageUrl.toString(),
+                      bounds: JSON.stringify(bounds),
+                      category: currentCategory
+                    },
+                  });
+                  
+                }
+              } else{
+                console.log("failed")
+              }
             }
             else if (currentCategory === "Jackets"){
-              let newPhoto = await sendImageToApi(photo.uri, localIP)
-              if(newPhoto)
-              dummyDB.Jackets.push(newPhoto)
-              setUri(newPhoto)
+              // let newPhoto = await sendImageToApi(photo.uri, localIP)
+              // if(newPhoto)
+              // dummyDB.Jackets.push(newPhoto)
+              // setUri(newPhoto)
+              if(compressedUri){
+                console.log("sending compressedURI")
+                const result = await MyModule.getSubjectImageURL(compressedUri);
+                const subjectImageUrl = result.uri;
+                const bounds = result.bounds
+                if(subjectImageUrl){
+                  
+                  router.push({
+                    pathname: '/editScreen',
+                    params: {
+                      image: compressedUri,
+                      subject: subjectImageUrl.toString(),
+                      bounds: JSON.stringify(bounds),
+                      category: currentCategory
+                    },
+                  });
+                  
+                }
+              } else{
+                console.log("failed")
+              }
             }
             else if (currentCategory === "Shoes"){
-              let newPhoto = await sendImageToApi(photo.uri, localIP)
-              if(newPhoto)
-              dummyDB.Shoes.push(newPhoto)
-              setUri(newPhoto)
+              // let newPhoto = await sendImageToApi(photo.uri, localIP)
+              // if(newPhoto)
+              // dummyDB.Shoes.push(newPhoto)
+              // setUri(newPhoto)
+              if(compressedUri){
+                console.log("sending compressedURI")
+                const result = await MyModule.getSubjectImageURL(compressedUri);
+                const subjectImageUrl = result.uri;
+                const bounds = result.bounds
+                if(subjectImageUrl){
+                  
+                  router.push({
+                    pathname: '/editScreen',
+                    params: {
+                      image: compressedUri,
+                      subject: subjectImageUrl.toString(),
+                      bounds: JSON.stringify(bounds),
+                      category: currentCategory
+                    },
+                  });
+                  
+                }
+              } else{
+                console.log("failed")
+              }
             }
-            dbEvents.emit('dbUpdated', { currentCategory, uri });
+            // dbEvents.emit('dbUpdated', { currentCategory, uri });
         }
         // console.log(dummyDB);
     };
@@ -164,34 +262,6 @@ export default function Upload(){
         setShowUpload(true);
         setCategory(category);
         console.log(category);
-        // const photo = await takePicture();
-        // if (photo){
-        //   if (currentCategory === "Shirt"){
-        //     dummyDB.Shirt.push(photo.uri)
-        //   }
-        //   else if (currentCategory === "Socks"){
-        //     dummyDB.Socks.push(photo.uri)
-        //   }
-        //   else if (currentCategory === "Pants"){
-        //     dummyDB.Pants.push(photo.uri)
-        //   }
-        //   else if (currentCategory === "Jackets"){
-        //     dummyDB.Jackets.push(photo.uri)
-        //   }
-        //   else if (currentCategory === "Shoes"){
-        //     dummyDB.Shoes.push(photo.uri)
-        //   }
-        //   setUri(photo.uri);
-        //   console.log("lmao");
-        //   console.log(dummyDB);
-
-        // }
-         
-        // else{
-        //   // setShowUpload(false);
-        //   // setUri(null);
-        
-        // }
     }
 
     function reset(){

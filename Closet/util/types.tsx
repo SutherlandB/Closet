@@ -3,6 +3,7 @@ export type EditScreenParams = {
     image: string;
     subject: string;
     bounds: string;
+    category: string;
   };
 export type PathWithWidth = {
     path: SkPath;
