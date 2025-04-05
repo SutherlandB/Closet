@@ -1,8 +1,9 @@
 import CollectionsRow from "@/components/CollectionsRow";
-import { dummyDB } from "./upload";
+import { dummyDB, userClothes } from "./upload";
 import {Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Button from "@/components/Button";
+import { useState } from "react";
 
 export default function Collections() {
     
@@ -10,23 +11,23 @@ export default function Collections() {
         <GestureHandlerRootView style={styles.container}>
             <Text>Shirts</Text>
         <View style = {styles.container}>
-            <CollectionsRow images = {dummyDB.Shirt}></CollectionsRow>
+            <CollectionsRow clothing = {userClothes.Shirt}></CollectionsRow>
         </View>
         <Text>Pants</Text>
         <View style = {styles.container}>
-            <CollectionsRow images = {dummyDB.Pants}></CollectionsRow>
+            <CollectionsRow clothing = {userClothes.Pants}></CollectionsRow>
         </View>
         <Text>Shoes</Text>
         <View style = {styles.container}>
-            <CollectionsRow images = {dummyDB.Shoes}></CollectionsRow>
+            <CollectionsRow clothing = {userClothes.Shoes}></CollectionsRow>
         </View>
         <Text>Socks</Text>
         <View style = {styles.container}>
-            <CollectionsRow images = {dummyDB.Socks}></CollectionsRow>
+            <CollectionsRow clothing = {userClothes.Socks}></CollectionsRow>
         </View>
-        <Text>Jacket</Text>
+        <Text>Jackets</Text>
         <View style = {styles.container}>
-            <CollectionsRow images = {dummyDB.Jackets}></CollectionsRow>
+            <CollectionsRow clothing = {userClothes.Jackets}></CollectionsRow>
         </View>
         </GestureHandlerRootView>
     );

@@ -1,6 +1,6 @@
 import { useLocalSearchParams, router } from 'expo-router';
 import { ScrollView } from 'react-native';
-import { v4 as uuidv4 } from 'uuid';
+import { ClothingFormData } from '@/util/types';
 import { PixelRatio } from 'react-native';
 import type { EditScreenParams } from '@/util/types';
 import React, { useState } from 'react';
@@ -38,7 +38,8 @@ import {
   SliderThumb,
   VStack,
   Image as GlueStackImage,
-  GluestackUIProvider
+  GluestackUIProvider,
+  FormControl, Input, InputField
 } from '@gluestack-ui/themed';
 import { config } from '@gluestack-ui/config';
 // import { EditorScreenPropType, PathWithWidth } from '../../types';
@@ -48,9 +49,6 @@ import { saveImageLocally, useUndoRedo } from '@/util/helpers';
 import { ClothingItem } from '@/models/ClothingItem';
 import { useForm, Controller } from 'react-hook-form';
 
-
-
-
 export default function EditScreen() {
 
   const { image, subject, bounds, category } = useLocalSearchParams<EditScreenParams>();
@@ -58,12 +56,13 @@ export default function EditScreen() {
   const cutout = useImage(subject);
   const original = useImage(image);
   const subjectBounds = JSON.parse(bounds as string);
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<ClothingFormData>({
   defaultValues: {
     brand: '',
     name: '',
-    category: '',
-    
+    size: '',
+    color: '',
+
   },
 });
   console.log("Data3: " , subjectBounds);
@@ -107,7 +106,7 @@ export default function EditScreen() {
   const OVERLAY_WIDTH = 128;
   const offset = OVERLAY_WIDTH / 2;
 
-  const onSave = async () => {
+  const onSave = async (formData: ClothingFormData) => {
     
     console.log("saving")
     const skiaImage = ref.current?.makeImageSnapshot();
@@ -127,6 +126,11 @@ export default function EditScreen() {
       params: {
         editedImage: fileUri,
         category: category,
+        name: formData.name,
+        brand: formData.brand,
+        size: formData.size,
+        color: formData.color
+
       },
     });
 
@@ -231,6 +235,7 @@ export default function EditScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 64, }}
         keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets={true}
         
       >
     <View style={{ flex: 1 }}>
@@ -426,8 +431,72 @@ export default function EditScreen() {
             <SliderThumb />
           </Slider>
         </Box>
-        
-        <Button onPress={onSave} mt={20}>
+        <FormControl mt={10}>
+          <Text>Brand</Text>
+          <Controller
+            control={control}
+            name="brand"
+            render={({ field: { onChange, value } }) => (
+              <Input>
+                <InputField
+                  placeholder="Balenci"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              </Input>
+            )}
+          />
+        </FormControl>
+        <FormControl mt={10}>
+          <Text>Name</Text>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <Input>
+                <InputField
+                  placeholder="Plaid shirt"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              </Input>
+            )}
+          />
+        </FormControl>
+
+        <FormControl mt={10}>
+          <Text>Size</Text>
+          <Controller
+            control={control}
+            name="size"
+            render={({ field: { onChange, value }}) => (
+              <Input>
+                <InputField
+                  placeholder="e.g. XS,S,M..."
+                  value={value}
+                  onChangeText={onChange}
+                />
+              </Input>
+            )}
+          />
+        </FormControl>
+        <FormControl mt={10}>
+          <Text>Color</Text>
+          <Controller
+            control={control}
+            name="color"
+            render={({ field: { onChange, value }}) => (
+              <Input>
+                <InputField
+                  placeholder="e.g. blue,red,black..."
+                  value={value}
+                  onChangeText={onChange}
+                />
+              </Input>
+            )}
+          />
+        </FormControl>
+        <Button onPress={handleSubmit(onSave)} mt={20}>
           <ButtonText>Save</ButtonText>
         </Button>
       </VStack>

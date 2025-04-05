@@ -14,6 +14,7 @@ import { shirtWorkflow, shirtWorkflow2} from '@/util/workflows';
 import { compressImage } from '@/util/compressImage';
 import MyModule from "@/modules/my-module";
 import { router, useLocalSearchParams } from 'expo-router';
+import { ClothingItem } from '@/models/ClothingItem';
 
 export const dbEvents = new EventEmitter();
 
@@ -24,11 +25,16 @@ export default function Upload(){
     const ref = useRef<CameraView>(null);
     const [uri, setUri] = useState<string | null>(null);
     const[currentCategory, setCategory] = useState<string | null>(null);
-    const { editedImage, category } = useLocalSearchParams();
+    const { editedImage, category, name, brand, size, color} = useLocalSearchParams();
 
     useEffect(() => {
-      if (editedImage) {
+      if (editedImage && typeof(name) === 'string' && typeof(category) === 'string' && typeof(editedImage) === 'string' && typeof(brand) === 'string' && typeof(size) === 'string' && typeof(color) === 'string') {
         console.log(category);
+        console.log(name, brand, size, color);
+        const newPiece = new ClothingItem(name, category, editedImage, brand, size, color);
+        if (["Shirt", "Pants", "Shoes", "Socks", "Jackets"].includes(category)) {
+          userClothes[category].push(newPiece);
+        }
         if (category === "Shirt")
           dummyDB.Shirt.push(editedImage.toString());
         if (category === "Pants")
@@ -235,7 +241,7 @@ export default function Upload(){
                 console.log("failed")
               }
             }
-            // dbEvents.emit('dbUpdated', { currentCategory, uri });
+            dbEvents.emit('dbUpdated', { currentCategory, uri });
         }
         // console.log(dummyDB);
     };
@@ -364,3 +370,12 @@ export var dummyDB: Record<"Shirt" | "Pants" | "Shoes" | "Socks" | "Jackets", st
   Socks: [],
   Shoes: []
 };
+
+export var userClothes: Record<string, ClothingItem[]> = {
+  Shirt: [],
+  Jackets: [],
+  Pants: [],
+  Socks: [],
+  Shoes: []
+}
+ 

@@ -15,3 +15,11 @@ export type ImageBody = {
     fileName: string;
     base64: string;
   };
+
+export type ClothingFormData = {
+  name: string,
+  brand: string,
+  size: string,
+  color: string,
+
+}
