@@ -22,7 +22,6 @@ type Props = {
 
 
 export default function CollectionsRow({ clothing, label, onPress }: Props) {
-    const [lord,setLord] = useState<string>('io');
     const [currentImages, setCurrentImages] = useState(clothing)
     const [selectedImage, setSelectedImage] = useState<ClothingItem | null>(null);
     const [categoryText, setCategoryText] = useState('Useless Text');
@@ -30,6 +29,7 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
     const [nameText, setNameText] = useState('Useless Text');
     const [colorText, setColorText] = useState('Useless Text');
     const [sizeText, setSizeText] = useState('Useless Text');
+    const [refreshFlag, setRefreshFlag] = useState(0);
     const {width} = useWindowDimensions();
     const insets = useSafeAreaInsets();
 
@@ -88,7 +88,7 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
           <Pressable key={index} onPress={() => setSelectedImage(x)}>
               <Image
                               key = {index}
-                              source={{ uri: x.getImageUri() }}
+                              source={{ uri: x.imageUri[x.display] }}
                               contentFit="contain"
                               style={{ aspectRatio: 1,
                                 height: 100,
@@ -152,8 +152,8 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
             <Ionicons name="close" size={32} color="black" />
           </TouchableOpacity>
           {/* <Pressable onPress={() => setSelectedImage(null)}> */}
-            <Image
-              source={{ uri: selectedImage.imageUri || '' }}
+            {/* <Image
+              source={{ uri: selectedImage.imageUri[selectedImage.display] || '' }}
               contentFit="contain"
               style={{
                 flex: 1,
@@ -162,7 +162,50 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
                 borderRadius: 12,
                 marginBottom: 20,
               }}
-            />
+            /> */}
+            <Text style={{ fontSize: 14, color: 'black', marginBottom: 4, marginTop: 40 }}>
+              Display
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={true}
+              indicatorStyle="black"
+              contentContainerStyle={{
+                paddingHorizontal: 10,
+                marginBottom: 20,
+                marginLeft: 20,
+                gap: 30,
+                
+              }}
+              style={{ width: width }}
+            >
+              {selectedImage.imageUri.map((uri, idx) => (
+                <Pressable
+                  key={idx}
+                  onPress={() => {
+                    // const updated = { ...selectedImage };
+                    selectedImage.display = idx;
+                    setSelectedImage(selectedImage);
+                    setRefreshFlag(prev => prev + 1);
+                  }
+                }
+                >
+                  <Image
+                    source={{ uri }}
+                    contentFit="cover"
+                    style={{
+                      flex: 1,
+                      width: width * 0.9,
+                      height: width*1.1,
+                      marginBottom: 15,
+                      borderRadius: 8,
+                      borderWidth: idx === selectedImage.display ? 1 : 0,
+                      borderColor: idx === selectedImage.display ? '#000' : 'transparent',
+                    }}
+                  />
+                </Pressable>
+              ))}
+            </ScrollView>
             {/* </Pressable> */}
             <Text style={{ fontSize: 14, color: 'gray', marginBottom: 4 }}>
               Brand

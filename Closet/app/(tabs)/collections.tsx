@@ -6,7 +6,6 @@ import Button from "@/components/Button";
 import { useState } from "react";
 
 export default function Collections() {
-    
     return (
         <GestureHandlerRootView style={styles.container}>
             <Text>Shirts</Text>

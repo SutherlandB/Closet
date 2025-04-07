@@ -1,19 +1,29 @@
+function generateGUID(): string {
+    const timestamp = new Date().getTime();
+    const randomNum = Math.floor(Math.random() * 1000000);
+    return `${timestamp}-${randomNum}`;
+    }
+
 export class ClothingItem {
+    id: string;
     name: string;
     category: string;
-    imageUri: string;
+    imageUri: string[];
     brand: string;
     size: string;
     color: string;
+    display: number;
   
-    constructor(name: string, category: string, imageUri: string, brand: string, size: string, color: string) {
+    constructor(id: string, name: string, category: string, imageUri: string, brand: string, size: string, color: string) {
       this.name = name;
       this.category = category;
       this.brand = brand;
-      this.imageUri = imageUri;
+      this.imageUri = [imageUri];
       this.size = size;
       this.color = color;
-
+      this.id = id;
+      this.display = 0;
+      console.log("ID: CLOTZHING OBK: ", this.id);
     }
   
     getFormattedLabel(): string {
@@ -25,7 +35,7 @@ export class ClothingItem {
     getCategory(): string{
         return this.category;
     }
-    getImageUri(): string{
+    getImageUri(): string[]{
         return this.imageUri;
     }
     getBrand(): string{
@@ -43,7 +53,7 @@ export class ClothingItem {
         this.category = category;
     }
     setImageUri(uri: string){
-        this.imageUri = uri;
+        this.imageUri.push(uri);
     }
     setBrand(brand: string){
         this.brand = brand;

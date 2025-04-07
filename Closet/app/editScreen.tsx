@@ -51,7 +51,7 @@ import { useForm, Controller } from 'react-hook-form';
 
 export default function EditScreen() {
 
-  const { image, subject, bounds, category } = useLocalSearchParams<EditScreenParams>();
+  const { image, subject, bounds, category, id } = useLocalSearchParams<EditScreenParams>();
   const {width, height} = useWindowDimensions();
   const cutout = useImage(subject);
   const original = useImage(image);
@@ -113,14 +113,12 @@ export default function EditScreen() {
     if (!skiaImage) return;
     console.log("snapshot taken")
     const base64 = skiaImage.encodeToBase64(ImageFormat.PNG, 100);
-    console.log("here");
     const uniqueFileName = subject.substring(subject.lastIndexOf('/')+1,subject.length); 
     const fileUri = await saveImageLocally({
       fileName: uniqueFileName,
       base64,
     });
     console.log(fileUri);
-    console.log(category);
     router.replace({
       pathname: '/upload',
       params: {
@@ -129,8 +127,8 @@ export default function EditScreen() {
         name: formData.name,
         brand: formData.brand,
         size: formData.size,
-        color: formData.color
-
+        color: formData.color,
+        id: id
       },
     });
 

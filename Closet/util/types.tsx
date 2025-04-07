@@ -1,9 +1,11 @@
 import { SkPath } from "@shopify/react-native-skia";
+
 export type EditScreenParams = {
     image: string;
     subject: string;
     bounds: string;
     category: string;
+    piece: 
   };
 export type PathWithWidth = {
     path: SkPath;
@@ -21,5 +23,5 @@ export type ClothingFormData = {
   brand: string,
   size: string,
   color: string,
-
+  id: string
 }

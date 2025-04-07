@@ -17,7 +17,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { ClothingItem } from '@/models/ClothingItem';
 
 export const dbEvents = new EventEmitter();
-
+export var allClothes: Record<string, ClothingItem> = {};
+// let temp: ClothingItem | null = null;
+function generateGUID(): string {
+  const timestamp = new Date().getTime();
+  const randomNum = Math.floor(Math.random() * 1000000);
+  return `${timestamp}-${randomNum}`;
+  }
+ 
 export default function Upload(){
     const [showUpload, setShowUpload] = useState<boolean>(false);
     const [facing, setFacing] = useState<CameraType>('back');
@@ -25,27 +32,39 @@ export default function Upload(){
     const ref = useRef<CameraView>(null);
     const [uri, setUri] = useState<string | null>(null);
     const[currentCategory, setCategory] = useState<string | null>(null);
-    const { editedImage, category, name, brand, size, color} = useLocalSearchParams();
+    const [currentPiece, setPiece] = useState<ClothingItem | null>(null);
+    const { editedImage, category, name, brand, size, color, id } = useLocalSearchParams();
 
     useEffect(() => {
-      if (editedImage && typeof(name) === 'string' && typeof(category) === 'string' && typeof(editedImage) === 'string' && typeof(brand) === 'string' && typeof(size) === 'string' && typeof(color) === 'string') {
-        console.log(category);
-        console.log(name, brand, size, color);
-        const newPiece = new ClothingItem(name, category, editedImage, brand, size, color);
-        if (["Shirt", "Pants", "Shoes", "Socks", "Jackets"].includes(category)) {
-          userClothes[category].push(newPiece);
-        }
-        if (category === "Shirt")
-          dummyDB.Shirt.push(editedImage.toString());
-        if (category === "Pants")
-          dummyDB.Pants.push(editedImage.toString());
-        if (category === "Shoes")
-          dummyDB.Shoes.push(editedImage.toString());
-        if (category === "Socks")
-          dummyDB.Socks.push(editedImage.toString());
-        if(category === "Jackets")
-          dummyDB.Jackets.push(editedImage.toString());
+      if (editedImage && typeof(name) === 'string' && typeof(category) === 'string' && typeof(editedImage) === 'string' && typeof(brand) === 'string' && typeof(size) === 'string' && typeof(color) === 'string' && typeof(id) === 'string' ) {
+        console.log(name, brand, size, color, id);
         setUri(editedImage.toString());
+        if(id in allClothes){
+          allClothes[id].imageUri.push(editedImage);
+          setPiece(allClothes[id]);
+        }
+        else{
+          const newPiece = new ClothingItem(id.toString(), name.toString(), category.toString(), editedImage.toString(), brand.toString(), size.toString(), color.toString());
+          allClothes[id] = newPiece;
+          if(newPiece){
+          
+            // const newPiece = new ClothingItem(name.toString(), category.toString(), editedImage.toString(), brand.toString(), size.toString(), color.toString());
+            if (["Shirt", "Pants", "Shoes", "Socks", "Jackets"].includes(category.toString())) {
+              userClothes[category.toString()].push(newPiece);
+            }
+            if (category === "Shirt")
+              dummyDB.Shirt.push(editedImage.toString());
+            if (category === "Pants")
+              dummyDB.Pants.push(editedImage.toString());
+            if (category === "Shoes")
+              dummyDB.Shoes.push(editedImage.toString());
+            if (category === "Socks")
+              dummyDB.Socks.push(editedImage.toString());
+            if(category === "Jackets")
+              dummyDB.Jackets.push(editedImage.toString());
+            setPiece(newPiece);
+          }
+        }
       }
     }, [editedImage]);
     // const localIP = "http://128.113.138.119:5000";
@@ -72,6 +91,13 @@ export default function Upload(){
         //   return photo;
         // }
         // should be in its own function (confirm button function after taking photo)
+        let temp = null;
+        if(!currentPiece){
+          temp = generateGUID();
+        }
+        else{
+          temp = currentPiece.id;
+        }
         if (photo){
             // setUri(photo?.uri);
             // console.log("lmao");
@@ -92,7 +118,8 @@ export default function Upload(){
                       image: compressedUri,
                       subject: subjectImageUrl.toString(),
                       bounds: JSON.stringify(bounds),
-                      category: currentCategory
+                      category: currentCategory,
+                      id: temp
                     },
                   });
                   
@@ -264,6 +291,14 @@ export default function Upload(){
       function toggleCameraFacing() {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
     }
+
+    function addNewPhoto(piece: ClothingItem) {
+      setUri(null);
+      setShowUpload(true);
+      setPiece(piece);
+      setCategory(piece.category);
+    }
+
     async function upload(category: string){
         setShowUpload(true);
         setCategory(category);
@@ -273,9 +308,10 @@ export default function Upload(){
     function reset(){
         setShowUpload(false);
         setUri(null);
+        setPiece(null);
+        setCategory(null);
     }
     return (
-        
         <View style = {styles.container}>
             <Text>Categories</Text>
             {uri ? (<View style = {styles.container}> 
@@ -283,7 +319,9 @@ export default function Upload(){
                 source={{ uri }}
                 contentFit="contain"
                 style={{ aspectRatio: 1, width: 500}}/>
-                <Button theme = 'standard' onPress={() => setUri(null)} label="Take another picture" /></View>) 
+                <Button theme = 'standard' onPress={() => currentPiece ? addNewPhoto(currentPiece) : setUri(null)} label="Add another picture of your piece" />
+                <Button theme = 'standard' onPress={() => reset()} label="Upload another piece"/>
+                </View>) 
             : (showUpload ? ( 
             <CameraView style={styles.camera} facing={facing} ref={ref}> 
             {/* <View style = {styles.optionsContainer}>
@@ -377,5 +415,7 @@ export var userClothes: Record<string, ClothingItem[]> = {
   Pants: [],
   Socks: [],
   Shoes: []
-}
+};
+
+
  
