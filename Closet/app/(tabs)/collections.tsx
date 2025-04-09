@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Button from "@/components/Button";
 import { useState } from "react";
 
-export default function Collections() {
+export default function Collections() { 
     return (
         <GestureHandlerRootView style={styles.container}>
             <Text>Shirts</Text>

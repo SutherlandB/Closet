@@ -56,6 +56,7 @@ export default function EditScreen() {
   const cutout = useImage(subject);
   const original = useImage(image);
   const subjectBounds = JSON.parse(bounds as string);
+  console.log(subjectBounds);
   const { control, handleSubmit } = useForm<ClothingFormData>({
   defaultValues: {
     brand: '',
@@ -109,7 +110,17 @@ export default function EditScreen() {
   const onSave = async (formData: ClothingFormData) => {
     
     console.log("saving")
-    const skiaImage = ref.current?.makeImageSnapshot();
+    const centerX = subjectX + subjectBounds.width * scaleFactor / 2;
+    const centerY = subjectY + subjectBounds.height * scaleFactor / 2;
+    const skiaImage = ref.current?.makeImageSnapshot({
+      // {
+      x: subjectX,  
+      y: subjectY, 
+      width: cWidth * scaleFactor ,
+      height: cHeight * scaleFactor
+    });
+
+    
     if (!skiaImage) return;
     console.log("snapshot taken")
     const base64 = skiaImage.encodeToBase64(ImageFormat.PNG, 100);

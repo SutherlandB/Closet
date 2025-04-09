@@ -12,6 +12,7 @@ import { useWindowDimensions } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FormControlErrorText } from '@gluestack-ui/config/build/theme';
+import { useImage } from '@shopify/react-native-skia';
 
 
 type Props = {
@@ -32,10 +33,8 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
     const [refreshFlag, setRefreshFlag] = useState(0);
     const {width} = useWindowDimensions();
     const insets = useSafeAreaInsets();
-
-
-
-
+    
+    
     useEffect(() => {
         // Listen for dbUpdated events
         const handleDbUpdated = () => {
@@ -75,6 +74,16 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
       dbEvents.emit('dbUpdated'); // optional event if you're syncing
       setSelectedImage(null); // close modal
     };
+
+    function imageWidth(clothing: string){
+      let selectedWidth = 0;
+      let tempImg = null;
+      if(selectedImage)
+        tempImg = useImage(clothing);
+      if(tempImg)
+        selectedWidth = tempImg.width()
+      return selectedWidth;
+      }
 
   return (
     
@@ -192,15 +201,16 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
                 >
                   <Image
                     source={{ uri }}
-                    contentFit="cover"
+                    contentFit="contain"
                     style={{
                       flex: 1,
-                      width: width * 0.9,
-                      height: width*1.1,
+                      width: width*0.9,
+                      aspectRatio: 1,
                       marginBottom: 15,
                       borderRadius: 8,
                       borderWidth: idx === selectedImage.display ? 1 : 0,
                       borderColor: idx === selectedImage.display ? '#000' : 'transparent',
+
                     }}
                   />
                 </Pressable>
@@ -257,7 +267,7 @@ export default function CollectionsRow({ clothing, label, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   scrollView: {
     justifyContent: 'center',
     flexDirection: 'row',

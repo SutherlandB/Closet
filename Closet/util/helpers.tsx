@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as FileSystem from 'expo-file-system';
 import { ImageBody } from "./types";
+import { PixelRatio } from 'react-native';
 
 export const TEMP_DIR = `${FileSystem.cacheDirectory}images/`;
 const imgFileUri = (fileName: string) => `${TEMP_DIR}${fileName}`;
@@ -69,3 +70,4 @@ export const saveImageLocally = async (image: ImageBody) => {
   
     return fileUri;
   };
+export const scale = PixelRatio.get();

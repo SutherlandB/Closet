@@ -15,6 +15,9 @@ import { compressImage } from '@/util/compressImage';
 import MyModule from "@/modules/my-module";
 import { router, useLocalSearchParams } from 'expo-router';
 import { ClothingItem } from '@/models/ClothingItem';
+import { useImage } from '@shopify/react-native-skia';
+import { UploadScreenParams } from '@/util/types';
+import { scale } from '@/util/helpers';
 
 export const dbEvents = new EventEmitter();
 export var allClothes: Record<string, ClothingItem> = {};
@@ -33,12 +36,22 @@ export default function Upload(){
     const [uri, setUri] = useState<string | null>(null);
     const[currentCategory, setCategory] = useState<string | null>(null);
     const [currentPiece, setPiece] = useState<ClothingItem | null>(null);
-    const { editedImage, category, name, brand, size, color, id } = useLocalSearchParams();
+    const { editedImage, category, name, brand, size, color, id } = useLocalSearchParams<UploadScreenParams>();
+    let editedWidth = 0
+    if(editedImage){
+      const tempImg = useImage(editedImage);
+      if(tempImg){
+        editedWidth = tempImg.width()/scale;
+        console.log(tempImg.width()/scale);
+      }
+    }
+    
 
     useEffect(() => {
       if (editedImage && typeof(name) === 'string' && typeof(category) === 'string' && typeof(editedImage) === 'string' && typeof(brand) === 'string' && typeof(size) === 'string' && typeof(color) === 'string' && typeof(id) === 'string' ) {
         console.log(name, brand, size, color, id);
         setUri(editedImage.toString());
+        
         if(id in allClothes){
           allClothes[id].imageUri.push(editedImage);
           setPiece(allClothes[id]);
@@ -318,7 +331,7 @@ export default function Upload(){
                 <Image
                 source={{ uri }}
                 contentFit="contain"
-                style={{ aspectRatio: 1, width: 500}}/>
+                style={{ aspectRatio: 1, width: editedWidth,}}/>
                 <Button theme = 'standard' onPress={() => currentPiece ? addNewPhoto(currentPiece) : setUri(null)} label="Add another picture of your piece" />
                 <Button theme = 'standard' onPress={() => reset()} label="Upload another piece"/>
                 </View>) 
@@ -366,6 +379,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#00000',
         justifyContent: 'center',
         alignItems: 'center',
+
+    },
+    previewImage: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 300,
+      aspectRatio: 1, 
     },
     text: {
         color: '#000000',

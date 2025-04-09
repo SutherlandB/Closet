@@ -5,8 +5,12 @@ export type EditScreenParams = {
     subject: string;
     bounds: string;
     category: string;
-    piece: 
+    id: string;
   };
+
+export type UploadScreenParams = {
+  editedImage: string, category: string, name: string, brand: string, size: string, color: string, id: string
+}
 export type PathWithWidth = {
     path: SkPath;
     strokeWidth: number;
